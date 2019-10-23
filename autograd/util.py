@@ -31,6 +31,8 @@ def toposort(end_node):
                 child_counts[parent] -= 1
 
 def wraps(fun, namestr="{fun}", docstr="{doc}", **kwargs):
+    # https://www.geeksforgeeks.org/decorators-with-parameters-in-python/
+    # decortor with augument
     def _wraps(f):
         try:
             f.__name__ = namestr.format(fun=get_name(fun), **kwargs)

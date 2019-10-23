@@ -37,5 +37,7 @@ def wrap_namespace(old, new):
             new[name] = wrap_intdtype(obj)
         elif type(obj) in unchanged_types:
             new[name] = obj
-
+# this function wrap np into primitive:
+# if np.negetive is diffable:return primitive wrapper
+# then change globals name negetive as primitive wrapper!!!!!!!!!!
 wrap_namespace(_np.__dict__, globals())
