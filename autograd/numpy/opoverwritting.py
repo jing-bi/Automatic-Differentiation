@@ -1,6 +1,6 @@
 from __future__ import absolute_import
 import types
-from autograd.tracer import primitive, notrace_primitive
+from autograd.inference import func_wrapper, notracefunc_wrapper
 import numpy as _np
 
 # ----- Non-differentiable functions -----
@@ -21,7 +21,7 @@ nograd_functions = [
 
 def wrap_intdtype(cls):
     class IntdtypeSubclass(cls):
-        __new__ = notrace_primitive(cls.__new__)
+        __new__ = notracefunc_wrapper(cls.__new__)
     return IntdtypeSubclass
 
 def wrap_namespace(old, new):
@@ -30,14 +30,12 @@ def wrap_namespace(old, new):
     function_types = {_np.ufunc, types.FunctionType, types.BuiltinFunctionType}
     for name, obj in old.items():
         if obj in nograd_functions:
-            new[name] = notrace_primitive(obj)
+            new[name] = notracefunc_wrapper(obj)
         elif type(obj) in function_types:
-            new[name] = primitive(obj)
+            new[name] = func_wrapper(obj)
         elif type(obj) is type and obj in int_types:
             new[name] = wrap_intdtype(obj)
         elif type(obj) in unchanged_types:
             new[name] = obj
-# this function wrap np into primitive:
-# if np.negetive is diffable:return primitive wrapper
-# then change globals name negetive as primitive wrapper!!!!!!!!!!
+# Set autograd.numpy.<function> = wrap(numpy.<function>)
 wrap_namespace(_np.__dict__, globals())
